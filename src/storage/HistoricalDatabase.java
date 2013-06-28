@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.lang.Thread;
+//import java.lang.Thread;
 
 public class HistoricalDatabase
 {
@@ -196,7 +196,7 @@ public class HistoricalDatabase
 		final int sensorID;
 		try
 		{
-			nodeID = getNodeDbId(mData.getNodeUUID());
+			nodeID = getNodeDbId(mData.getNodeUUID(), Utils.getMachineName());
 			sensorID = getSensorDbId(mData.getSensor());
 
 			saveOrUpdateToDatabase(String.format(
@@ -295,7 +295,7 @@ public class HistoricalDatabase
 		} else
 		{
 			final String timeID = getTime();
-			final int nodeID = getNodeDbId(eData.getNodeUUID());
+			final int nodeID = getNodeDbId(eData.getNodeUUID(), Utils.getMachineName());
 			saveOrUpdateToDatabase(String.format(
 					SqlScripts.INSERT_ENERGY_CONSUMPTION, nodeID, timeID,
 					eData.getTotal(), eData.getCpu(), eData.getDisk(),
@@ -327,10 +327,10 @@ public class HistoricalDatabase
 	 * @return the database ID of the monitored node.
 	 * @throws SQLException
 	 */
-	private int getNodeDbId(int _dataNodeUUID)
+	private int getNodeDbId(int _dataNodeUUID, String nodeName)
 	{
 		final String timeID = getTime();
-		final String nodeName = Utils.getMachineName();
+		//final String nodeName = Utils.getMachineName();
 		
 		if (!this.nodes.containsKey(_dataNodeUUID)) {
 			saveOrUpdateToDatabase(String.format(
