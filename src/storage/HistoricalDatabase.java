@@ -7,6 +7,9 @@ import usage.MonitoredData;
 import usage.SensorChannel;
 import usage.SensorData;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +29,32 @@ public class HistoricalDatabase
 	//private Map<Integer, DateTime, String, Integer> nodes; // ID | TIME | NAME | UUID
 	private Map<Integer, Integer> sensors;
 	private Map<String, Integer> unities;
+	
+	public static String getUserName() {
+		String ex = new String("exception");
+    	try {			
+	    	Runtime run = Runtime.getRuntime();
+			Process p;
+			p = run.exec("whoami");
+			p.waitFor();
+			
+			BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = new String(ex);
+			String auxLine = new String();
+			while ((auxLine = b.readLine()) != null) {
+			  line = auxLine;
+			}
+			return line;
+		}
+		catch (IOException e) {
+			Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, e);
+			return ex;
+		}
+		catch (InterruptedException e) {
+			Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, e);
+			return ex;
+		}
+	}
 
 	/**
 	 * O construtor cria uma nova conexão com o banco de dados sqlite contido no
@@ -37,7 +66,13 @@ public class HistoricalDatabase
 		try
 		{
 			Class.forName("org.sqlite.JDBC");
-			conn = DriverManager.getConnection("jdbc:sqlite:" + file);
+			String ex = new String("exception");
+			String USER_NAME = new String(getUserName());
+			while (USER_NAME == ex)
+				USER_NAME = getUserName();
+			//System.out.println("jdbc:sqlite:/home/" + USER_NAME + "/iaee/" + file);//debug
+			//System.exit(0);//debug
+			conn = DriverManager.getConnection("jdbc:sqlite:/home/" + USER_NAME + "/iaee/" + file);
 			initDB();
 		} catch (final SQLException e)
 		{
@@ -145,7 +180,6 @@ public class HistoricalDatabase
 			{ // process results one row at a time
 				if (!this.nodes.containsKey(result.getInt(4)))
 					this.nodes.put(result.getInt(4), result.getInt(1));
-					System.out.println("this.nodes.get(" + result.getInt(4) + "): " + this.nodes.get(result.getInt(4))); //debug
 			}
 		} catch (SQLException e)
 		{

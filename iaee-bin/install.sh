@@ -50,13 +50,17 @@ if [ ! -d "$HOME/iaee/" ]
   else
     echo "iaee directory already exists in $HOME"
     sleep 1
-    if [ -f "$HOME/iaee/historical.db" ]
+    if [ -f "$HOME/iaee/iaee.db" ]
       then
-        echo "Moving old historical db..."
+        echo "Moving old iaee db..."
         sleep 1
         dbctrl=`cat $HOME/iaee/.db.ctrl`
         dbctrl=$(($dbctrl+1))
-        sudo mv $HOME/iaee/historical.db $HOME/iaee/historical-$dbctrl.db
+        mv $HOME/iaee/iaee.db $HOME/iaee/iaee-$dbctrl.db
+        if [ -f "$HOME/iaee/iaee.db-journal" ]
+        then
+          rm $HOME/iaee/iaee.db-journal
+        fi
         echo $dbctrl > $HOME/iaee/.db.ctrl
     fi
 fi

@@ -3,6 +3,7 @@
 if [ $# -eq 1 ]
 then
   index=0
+  ps aux | grep iaee.jar
   pids=`ps aux | grep iaee.jar | tr -s ' ' | cut -d ' ' -f 2`  
   while [ $index -ne $1 ]; do 
     index=$(($index+1))
