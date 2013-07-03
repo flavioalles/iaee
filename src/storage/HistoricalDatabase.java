@@ -230,7 +230,7 @@ public class HistoricalDatabase
 		final int sensorID;
 		try
 		{
-			nodeID = getNodeDbId(mData.getNodeUUID(), Utils.getMachineName());
+			nodeID = getNodeDbId(mData.getNodeUUID(), mData.getNodeName());
 			sensorID = getSensorDbId(mData.getSensor());
 
 			saveOrUpdateToDatabase(String.format(
@@ -364,7 +364,6 @@ public class HistoricalDatabase
 	private int getNodeDbId(int _dataNodeUUID, String nodeName)
 	{
 		final String timeID = getTime();
-		//final String nodeName = Utils.getMachineName();
 		
 		if (!this.nodes.containsKey(_dataNodeUUID)) {
 			saveOrUpdateToDatabase(String.format(

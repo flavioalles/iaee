@@ -47,7 +47,7 @@ if [ ! -d "$HOME/iaee/" ]
     touch $HOME/iaee/.db.ctrl 
     echo "0" > $HOME/iaee/.db.ctrl
     echo "Copying scripts/ to $HOME/iaee/"
-    cp -r $CURRENT_DIR/scripts/ $HOME/iaee/
+    cp -r $CURRENT_DIR/ $HOME/iaee/
     echo "ls -l $HOME/iaee/"
     ls -la $HOME/iaee
     sleep 2
@@ -61,17 +61,17 @@ if [ ! -d "$HOME/iaee/" ]
         dbctrl=`cat $HOME/iaee/.db.ctrl`
         dbctrl=$(($dbctrl+1))
         mv $HOME/iaee/iaee.db $HOME/iaee/iaee-$dbctrl.db
-        if [ -f "$HOME/iaee/iaee.db-journal" ]
-        then
-          rm $HOME/iaee/iaee.db-journal
-        fi
         echo $dbctrl > $HOME/iaee/.db.ctrl
+    fi
+    if [ -f "$HOME/iaee/iaee.db-journal" ]
+    then
+      rm $HOME/iaee/iaee.db-journal
     fi
     if [ -d "$HOME/iaee/scripts/" ]
       then
         rm -rf $HOME/iaee/scripts/
-        echo "Copying scripts/ to $HOME/iaee"
-        cp -r $CURRENT_DIR/scripts/ $HOME/iaee/
     fi
+    echo "Copying scripts/ to $HOME/iaee"
+    cp -r $CURRENT_DIR/ $HOME/iaee/
 fi
 

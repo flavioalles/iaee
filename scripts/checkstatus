@@ -1,0 +1,10 @@
+#!/bin/bash
+
+lines=`ps aux | grep iaee.jar | wc -l`
+if [ $lines -eq 1 ]
+then
+  echo "iaee is not running."
+else
+  echo "iaee is up and running"
+  ps aux | grep iaee.jar | sed $(($lines-1))q
+fi

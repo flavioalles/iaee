@@ -17,6 +17,7 @@ public class MonitoredData implements Serializable {
      */
     private static final long serialVersionUID = 7909922150038205539L;
     private int nodeUUID;
+    private String nodeName;
 
     private Map<Integer, CpuData> cpu;
 
@@ -28,7 +29,7 @@ public class MonitoredData implements Serializable {
 
     private SensorData sensor;
 
-    public MonitoredData(int _uuid, Map<Integer, CpuData> _cpu, MemData _mem,
+    public MonitoredData(int _uuid, String _nodeName, Map<Integer, CpuData> _cpu, MemData _mem,
                          Map<String, DiskData> _disk, Map<String, NetworkData> _net,
                          SensorData _sensor) {
         if (_cpu == null)
@@ -45,7 +46,8 @@ public class MonitoredData implements Serializable {
                     "Network monitored data object is null");
 
         this.nodeUUID = _uuid;
-
+        this.nodeName = _nodeName;
+        
         this.cpu = _cpu;
         this.mem = _mem;
         this.disk = _disk;
@@ -56,7 +58,11 @@ public class MonitoredData implements Serializable {
     public int getNodeUUID() {
         return this.nodeUUID;
     }
-
+    
+    public String getNodeName() {
+    	return this.nodeName;
+    }
+    
     /**
      * @return the cpu
      */

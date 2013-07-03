@@ -240,7 +240,7 @@ class NodeInfoGather
 		
 		System.out.println("IP Address of the client: " + String.valueOf(uuid));
 
-		return new MonitoredData(this.uuid,
+		return new MonitoredData(this.uuid, Utils.getMachineName(),
 				fillCpuData(pp.gatherUsage(UsageType.CPU)),
 				fillMemData(pp.gatherUsage(UsageType.MEMORY)),
 				fillDiskData(pp.gatherUsage(UsageType.DISK)),
