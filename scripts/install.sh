@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CURRENT_DIR=$PWD
+
 # /opt/
 if [ ! -d "/opt/iaee/" ]
   then
@@ -10,7 +12,7 @@ if [ ! -d "/opt/iaee/" ]
     echo "iaee directory already exists in /opt"
     sleep 1
 fi
-sudo cp iaee.jar /opt/iaee/
+sudo cp $CURRENT_DIR/iaee.jar /opt/iaee/
 echo "ls -l /opt/iaee/"
 ls -l /opt/iaee/
 sleep 2
@@ -25,7 +27,7 @@ if [ ! -d "/etc/iaee/" ]
     echo "iaee directory already exists in /etc"
     sleep 1
 fi
-sudo cp config.properties /etc/iaee/
+sudo cp $CURRENT_DIR/config.properties /etc/iaee/
 echo "ls -l /etc/iaee/"
 ls -l /etc/iaee/
 sleep 2
@@ -44,6 +46,8 @@ if [ ! -d "$HOME/iaee/" ]
     sleep 1
     touch $HOME/iaee/.db.ctrl 
     echo "0" > $HOME/iaee/.db.ctrl
+    echo "Copying scripts/ to $HOME/iaee/"
+    cp -r $CURRENT_DIR/scripts/ $HOME/iaee/
     echo "ls -l $HOME/iaee/"
     ls -la $HOME/iaee
     sleep 2
@@ -62,6 +66,12 @@ if [ ! -d "$HOME/iaee/" ]
           rm $HOME/iaee/iaee.db-journal
         fi
         echo $dbctrl > $HOME/iaee/.db.ctrl
+    fi
+    if [ -d "$HOME/iaee/scripts/" ]
+      then
+        rm -rf $HOME/iaee/scripts/
+        echo "Copying scripts/ to $HOME/iaee"
+        cp -r $CURRENT_DIR/scripts/ $HOME/iaee/
     fi
 fi
 
