@@ -34,12 +34,12 @@ def checkStatus():
 
 
 def helpMsg():
-   print "iaee-status: checks if there are any running instances of iaee."
+   print "iaee-status: checks if there are any running instances of iaee (master & client)."
    print
    print "Usage:"
-   print "     <iaee-status> "
-   print "     <iaee-status quiet>"
-   print "     <iaee-status help>"
+   print "     <iaee-status> checks if there are any running instances of iaee (verbosely)."
+   print "     <iaee-status quiet> checks if there are any running instances of iaee (no messages printed to stdout - to be used by other programs via exit statuses (below))."
+   print "     <iaee-status help> prints this help message."
    print
    print "Exit status:"
    print "     0 - Nothing running"
@@ -49,7 +49,7 @@ def helpMsg():
    print
 
 def getHelpMsg():
-   print "Wrong Usage."
+   print "Wrong usage."
    print "Type <iaee-status help> for usage instructions."
 
 def main(argv):
