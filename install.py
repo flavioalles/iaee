@@ -24,7 +24,7 @@ def fullinstall(CWD, IAEE_HOME):
       os.mkdir(IAEE_HOME + '/.client')
       os.mkdir(IAEE_HOME + '/.master')
    # /conf: copy 'config.properties'
-   
+   #shutil.copy(CWD) 
    # /db: move old db, if any | remove SQLite journal files | create .db.ctrl
    # /jar: copy 'iaee.jar'
    # /scripts: copy scripts to iaee's directory
