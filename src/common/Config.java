@@ -2,7 +2,7 @@ package common;
 
 public enum Config {
     ;
-    public static final String CONFIG_FILE = "/etc/iaee/config.properties";
+    public static final String CONFIG_FILE = "config.properties";
     public static final String PORT = "PORT";
     public static final String SERVER_ADDRESS = "SERVER_ADDRESS";
     public static final String IS_SENSORED = "IS_SENSORED";

@@ -34,7 +34,11 @@ public class Main
 		Properties configFile = new Properties();
 		try
 		{
-			configFile.load(new FileInputStream(Config.CONFIG_FILE));
+			String ex = new String("exception");
+			String USER_NAME = new String(HistoricalDatabase.getUserName());
+			while (USER_NAME == ex)
+				USER_NAME = HistoricalDatabase.getUserName();
+			configFile.load(new FileInputStream("/home/" + USER_NAME + "/.iaee/" + Config.CONFIG_FILE));
 
 			if (args.length != 1)
 			{
