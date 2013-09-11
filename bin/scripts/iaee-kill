@@ -1,0 +1,73 @@
+#!/usr/bin/python
+
+import sys
+import os.path
+import subprocess
+
+def killMaster():
+   # pkill -F $HOME/.iaee/.master.pid
+   command = list(['pkill', '-F', os.path.expanduser('~') + '/.iaee/.master.pid'])
+   """
+   if [ $? -eq 0 ]
+   then
+      echo "iaee-master killed."
+   elif [ $? -eq 1 ]
+   then
+      echo "No iaee-master to be killed"
+   else
+      echo "pkill error."
+   fi
+   """
+
+def killClient()
+   # pkill -F $HOME/.iaee/.client.pid
+   command = list(['pkill', '-F', os.path.expanduser('~') + '/.iaee/.client.pid'])
+   """
+   if [ $? -eq 0 ]
+   then
+      echo "iaee-client killed."
+   elif [ $? -eq 1 ]
+   then
+      echo "No iaee-client to be killed"
+   else
+      echo "pkill error."
+   fi
+   """
+
+def helpMsg():
+   print "iaee-kill: kills running instances of iaee"
+   print
+   print "Usage:"
+   print "     <iaee-kill all> kills master and client running istances of iaee."
+   print "     <iaee-kill all> kills master running istance of iaee."
+   print "     <iaee-kill client> kills client running istances of iaee."
+   print "     <iaee-kill help> prints this help message" 
+
+def getHelpMsg():
+   print "Wrong Usage."
+   print "Type <iaee-kill help> for usage instructions."
+
+def main(argv):
+   # check arguments: if the number of arguments is different than one, abort execution after printing how to get help message
+   if len(argv) == 1:
+      # if 'all', (try to) kill both master and client
+      if argv[0] == 'all':
+         killMaster()
+         killClient()
+      # if 'master', (try to) kill master
+      elif argv[0] == 'master':
+         killMaster()
+      # if 'client', (try to) kill client
+      elif argv[0] == 'client':
+         killClient()
+      # if 'help', print help message
+      elif argv[0] == 'help':
+         helpMsg()
+      # if none of the above, print how to get help message 
+      else:
+         getHelpMsg()
+   else:
+      getHelpMsg()
+
+if __name__ == "__main__":
+   main(sys.argv[1:])

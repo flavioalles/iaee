@@ -1,0 +1,79 @@
+#!/usr/bin/python
+
+from os import devnull as DEVNULL
+import os.path
+import sys
+import subprocess
+import socket
+
+# checks if iaee is running
+
+def checkStatus():
+   status = 0
+   # pgrep -F $HOME/.iaee/.[client||master].pid
+   for instance in ['master', 'client']:
+      if instance == 'master':
+         pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '.pid'])
+      else:
+         pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '.pid']) #dbg
+         #pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '-' + socket.gethostname() + '.pid'])
+      try:
+         output = subprocess.check_output(pgrep, stderr=open(DEVNULL, 'wb'))
+      except subprocess.CalledProcessError as e:
+         output = e.output
+      try:
+         output = int(output)
+      except ValueError:
+         output = int(0)
+      if instance == 'master':
+         status += output
+      else:
+         status += 2*output
+
+   return status
+
+
+def helpMsg():
+   print "iaee-status: checks if there are any running instances of iaee."
+   print
+   print "Usage:"
+   print "     <iaee-status> "
+   print "     <iaee-status quiet>"
+   print "     <iaee-status help>"
+   print
+   print "Exit status:"
+   print "     0 - Nothing running"
+   print "     1 - Master running"
+   print "     2 - Client Running"
+   print "     3 - Master & Client running"
+   print
+
+def getHelpMsg():
+   print "Wrong Usage."
+   print "Type <iaee-status help> for usage instructions."
+
+def main(argv):
+   status = 0
+   if len(argv) == 0:
+      status = checkStatus()
+      if status == 0:
+         print "iaee is not running."
+      elif status == 1:
+         print "iaee-master is running."
+      elif status == 2:
+         print "iaee-client is running."
+      else:
+         print "iaee-master & iaee-client are running."
+   elif len(argv) == 1:
+      if argv[0] == 'quiet':
+         status = checkStatus()
+      elif argv[0] == 'help':
+         helpMsg()
+      else:
+         getHelpMsg()
+   else:
+      getHelpMsg()
+   sys.exit(status)
+
+if __name__ == "__main__":
+   main(sys.argv[1:])

@@ -1,0 +1,20 @@
+#!/usr/bin/python
+
+import os.path
+
+def main(argv):
+   if len(argv) == 0:
+      # check pid on $HOME/.iaee/.master.pid (if any) to see if master is already running
+      #iaee-status
+      
+      print "Starting master..."
+      print "-- Output will be redirected to $HOME/.iaee/.master.tty -- (tail that file to know what is going on)"
+      #sleep 1
+      #java -jar $HOME/.iaee/iaee.jar -m &> $HOME/.iaee/.master.tty &
+      #echo $! > $HOME/.iaee/.master.pid
+   else:
+      print "Wrong usage."
+      print "Type <iaee-master> to run an instance of iaee master."
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
