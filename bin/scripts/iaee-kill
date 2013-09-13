@@ -1,73 +1,114 @@
 #!/usr/bin/python
 
-import sys
 import os.path
+import socket
 import subprocess
 
-def killMaster():
-   # pkill -F $HOME/.iaee/.master.pid
-   command = list(['pkill', '-F', os.path.expanduser('~') + '/.iaee/.master.pid'])
-   """
-   if [ $? -eq 0 ]
-   then
-      echo "iaee-master killed."
-   elif [ $? -eq 1 ]
-   then
-      echo "No iaee-master to be killed"
-   else
-      echo "pkill error."
-   fi
-   """
+def killclient(IAEE_HOME):
+   status = subprocess.call(['iaee-status','quiet'])
+   if status == 2 or status == 3:
+      # pkill -F $HOME/.iaee/.client/client-$HOSTNAME.pid
+      killed = subprocess.call(['pkill', '-F', IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid'])
+   return killed
 
-def killClient()
-   # pkill -F $HOME/.iaee/.client.pid
-   command = list(['pkill', '-F', os.path.expanduser('~') + '/.iaee/.client.pid'])
-   """
-   if [ $? -eq 0 ]
-   then
-      echo "iaee-client killed."
-   elif [ $? -eq 1 ]
-   then
-      echo "No iaee-client to be killed"
-   else
-      echo "pkill error."
-   fi
-   """
+def killmaster(IAEE_HOME):
+   killed = False
+   status = subprocess.call(['iaee-status','quiet'])
+   if status == 1 or status == 3:
+      # pkill -F $HOME/.iaee/.master/master-$HOSTNAME.pid
+      killed = subprocess.call(['pkill', '-F', IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid'])
+   return killed
 
-def helpMsg():
-   print "iaee-kill: kills running instances of iaee"
+def helpmsg():
+   print("iaee-kill: kills running instances of iaee"
    print
-   print "Usage:"
-   print "     <iaee-kill all> kills master and client running istances of iaee."
-   print "     <iaee-kill all> kills master running istance of iaee."
-   print "     <iaee-kill client> kills client running istances of iaee."
-   print "     <iaee-kill help> prints this help message" 
+   print("Usage:")
+   print("     <iaee-kill [all]> kills master and client running istances of iaee.")
+   print("     <iaee-kill client> kills client running istances of iaee.")
+   print("     <iaee-kill master> kills master running istance of iaee.")
+   print("     <iaee-kill help> prints this help message")
+   return True
 
-def getHelpMsg():
-   print "Wrong Usage."
-   print "Type <iaee-kill help> for usage instructions."
-
+def gethelpmsg():
+   print("Wrong usage.")
+   print("Type <iaee-master help> for usage instructions.")
+   return True
+   
 def main(argv):
-   # check arguments: if the number of arguments is different than one, abort execution after printing how to get help message
-   if len(argv) == 1:
-      # if 'all', (try to) kill both master and client
-      if argv[0] == 'all':
-         killMaster()
-         killClient()
-      # if 'master', (try to) kill master
+   IAEE_HOME = os.path.expanduser('~') + '/.iaee' 
+   if not len(argv) == 0:
+      # iaee-kill all
+      killed = killclient(IAEE_HOME)
+      if killed == 0:
+         # one or more processes matched the criteria
+         print("iaee-client running on " + str(socket.gethostname() + " killed.")
+      elif killed == 1:
+         # no processes matched 
+         print("no iaee-client to kill on " + str(socket.gethostname()) + ".")
+      else:  
+         # syntax or fatal error (pkill)
+         print("pkill error.")
+      killed = killmaster(IAEE_HOME)
+      if killed == 0:
+         # one or more processes matched the criteria
+         print("iaee-master running on " + str(socket.gethostname() + " killed.")
+      elif killed == 1:
+         # no processes matched 
+         print("no iaee-master to kill on " + str(socket.gethostname()) + ".")
+      else:  
+         # syntax or fatal error (pkill)
+         print("pkill error.")
+   elif len(argv) == 1:
+      if argv[0] == 'client':
+         # kill client
+         killed = killclient(IAEE_HOME)
+         if killed == 0:
+            # one or more processes matched the criteria
+            print("iaee-client running on " + str(socket.gethostname() + " killed.")
+         elif killed == 1:
+            # no processes matched 
+            print("no iaee-client to kill on " + str(socket.gethostname()) + ".")
+         else:  
+            # syntax or fatal error (pkill)
+            print("pkill error.")
       elif argv[0] == 'master':
-         killMaster()
-      # if 'client', (try to) kill client
-      elif argv[0] == 'client':
-         killClient()
-      # if 'help', print help message
-      elif argv[0] == 'help':
-         helpMsg()
-      # if none of the above, print how to get help message 
+         # kill master
+         killed = killmaster(IAEE_HOME)
+         if killed == 0:
+            # one or more processes matched the criteria
+            print("iaee-master running on " + str(socket.gethostname() + " killed.")
+         elif killed == 1:
+            # no processes matched 
+            print("no iaee-master to kill on " + str(socket.gethostname()) + ".")
+         else:  
+            # syntax or fatal error (pkill)
+            print("pkill error.")
+      elif argv[0] == 'all': 
+         # iaee-kill all
+         killed = killclient(IAEE_HOME)
+         if killed == 0:
+            # one or more processes matched the criteria
+            print("iaee-client running on " + str(socket.gethostname() + " killed.")
+         elif killed == 1:
+            # no processes matched 
+            print("no iaee-client to kill on " + str(socket.gethostname()) + ".")
+         else:  
+            # syntax or fatal error (pkill)
+            print("pkill error.")
+         killed = killmaster(IAEE_HOME)
+         if killed == 0:
+            # one or more processes matched the criteria
+            print("iaee-master running on " + str(socket.gethostname() + " killed.")
+         elif killed == 1:
+            # no processes matched 
+            print("no iaee-master to kill on " + str(socket.gethostname()) + ".")
+         else:  
+            # syntax or fatal error (pkill)
+            print("pkill error.")
       else:
-         getHelpMsg()
+         gethelpmsg(IAEE_HOME)
    else:
-      getHelpMsg()
+      gethelpmsg(IAEE_HOME)
 
 if __name__ == "__main__":
    main(sys.argv[1:])

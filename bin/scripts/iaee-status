@@ -16,7 +16,7 @@ def checkStatus():
          pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '.pid'])
       else:
          pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '.pid']) #dbg
-         #pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '-' + socket.gethostname() + '.pid'])
+         #pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '-' + str(socket.gethostname()) + '.pid'])
       try:
          output = subprocess.check_output(pgrep, stderr=open(DEVNULL, 'wb'))
       except subprocess.CalledProcessError as e:

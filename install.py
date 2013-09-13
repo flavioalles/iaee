@@ -3,6 +3,7 @@
 import os
 import os.path
 import shutil
+import socket
 import sys
 from time import sleep
 
@@ -11,37 +12,124 @@ from time import sleep
 # jar file, configuration files and scripts are placed on a hidden folder that is created on the users home directory (/$HOME/.iaee)
 # initialization scripts (iaee-master & iaee-client) are placed on $HOME/bin
 
-def fullinstall(CWD, IAEE_HOME):
-   print("Full install.")
-   sleep(1)
-   # create iaee hidden folder in users HOME
+def createfile(filename):
+   fl = open(filename, 'w')
+   fl.close()
+   return True
+
+def updatecontrolfile(IAEE_HOME)
+   # get value from .db.ctrl
+   fl = open(IAEE_HOME + '/.ctrl.db', 'r')
+   n = fl.readline()
+   if not n:
+      n = int(0)
+   else:
+      n = int(n)
+   fl.close()
+   # update control file value to n+1
+   fl = open(IAEE_HOME + '/.ctrl.db', 'w')
+   fl.write(str(n+1) + '\n')
+   fl.close()
+   return n
+
+def movedb(IAEE_HOME)
+   # move iaee.db to old/iaee-n.db
+   os.rename(IAEE_HOME + '/db/iaee.db', IAEE_HOME + '/db/old/iaee-' + str(updatecontrolfile(IAEE_HOME)) + '.db')
+   return True
+
+def iaeehome(IAEE_HOME):
    if not os.path.isdir(IAEE_HOME):
       os.mkdir(IAEE_HOME)
+   return True
+
+def conf(CWD, IAEE_HOME):
+   if not os.path.isdir(IAEE_HOME + '/conf'):
       os.mkdir(IAEE_HOME + '/conf')
-      os.mkdir(IAEE_HOME + '/db')
-      os.mkdir(IAEE_HOME + '/jar')
-      os.mkdir(IAEE_HOME + '/scripts')
-      os.mkdir(IAEE_HOME + '/.client')
-      os.mkdir(IAEE_HOME + '/.master')
    # /conf: copy 'config.properties'
-   #shutil.copy(CWD) 
+   shutil.copy(CWD + '/conf/config.properties', IAEE_HOME + '/conf') 
+   return True
+
+def db(IAEE_HOME):
    # /db: move old db, if any | remove SQLite journal files | create .db.ctrl
+   if not os.path.isdir(IAEE_HOME + '/db'):
+      os.mkdir(IAEE_HOME + '/db')
+      os.mkdir(IAEE_HOME + '/db/old')
+      createfile(IAEE_HOME + '/.ctrl.db') 
+   else:
+      if os.path.isfile(IAEE_HOME + '/db/iaee.db'):
+         # move old db 
+         movedb(IAEE_HOME) 
+      if os.path.isfile(IAEE_HOME + '/db/iaee.db-journal'):
+         # remove SQLite journal files
+         os.remove(IAEE_HOME + '/db/iaee.db-journal')
+   return True
+
+def jar(CWD, IAEE_HOME):
+   if not os.path.isdir(IAEE_HOME + '/jar'):
+      os.mkdir(IAEE_HOME + '/jar')
    # /jar: copy 'iaee.jar'
+   shutil.copy(CWD + '/jar/iaee.jar', IAEE_HOME + '/jar')
+   return True
+
+def scripts(CWD, IAEE_HOME):
+   if not os.path.isdir(IAEE_HOME + '/scripts'):
+      os.mkdir(IAEE_HOME + '/scripts')
    # /scripts: copy scripts to iaee's directory
-   # /.client & /.master: creation of hidden files in the hidden directory (*.pid, *.tty) 
+   for dirpath, dirname, filename in os.walk(CWD + '/bin'):
+      for fl in filename:
+         shutil.copy(os.path.join(dirpath, fl), IAEE_HOME + '/scripts')
+   return True
+
+def hiddenclientdir(IAEE_HOME):
+   if not os.path.isdir(IAEE_HOME + '/.client'):
+      os.mkdir(IAEE_HOME + '/.client')
+   # /.client: creation of hidden files in the hidden directory (*.pid, *.tty) 
+   for fileext in ['.pid', '.tty', '-stderr.tty']:
+      createfile(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + fileext)
+   return True
+
+def hiddenmasterdir(IAEE_HOME):
+   if not os.path.isdir(IAEE_HOME + '/.master'):
+      os.mkdir(IAEE_HOME + '/.master')
+   # /.master: creation of hidden files in the hidden directory (*.pid, *.tty) 
+   for fileext in ['.pid', '.tty', '-stderr.tty']:
+      createfile(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + fileext)
+   return True
+
+def homebin(CWD):
    # Create $HOME/bin if it does not exist
    if not os.path.isdir(os.path.expanduser('~') + '/bin'):
       os.mkdir(os.path.expanduser('~') + '/bin')
    # copy iaee initialization scripts and management scripts to $HOME/bin
+   for dirpath, dirname, filename in os.walk(CWD + '/bin'):
+      for fl in filename:
+         shutil.copy(os.path.join(dirpath, fl), os.path.expanduser('~') + '/bin')
+   return True
+
+def fullinstall(CWD, IAEE_HOME):
+   print("Full install.")
+   sleep(1)
+   # create iaee hidden folder in users HOME
+   iaeehome(IAEE_HOME) 
+   conf(CWD, IAEE_HOME)
+   db(IAEE_HOME)
+   jar(CWD, IAEE_HOME)
+   scripts(CWD, IAEE_HOME)
+   hiddenclientdir(IAEE_HOME)            
+   hiddenmasterdir(IAEE_HOME)
+   homebin(CWD)
    # Done
    print("Done.")
    sleep(1)
+   return True
 
 def clientinstall(CWD, IAEE_HOME):
    print("Client install.")
    sleep(1)
+   hiddenclientdir(IAEE_HOME)            
    print("Done.")
    sleep(1)
+   return True
 
 def helpmsg():
    print("install.py: installs iaee on the users home directory.")
@@ -51,11 +139,13 @@ def helpmsg():
    print("     <python install.py client> installs only necessary files for client use (to be used in a NFS environment).")
    print("     <python install.py help> prints this help message.")
    print
+   return True
 
 def gethelpmsg():
    print("Wrong usage.")
    print("Type <python install.py help> for usage instructions.")
-   
+   return True
+
 def main(argv):
    CWD = os.getcwd()
    IAEE_HOME = os.path.expanduser('~') + '/.iaee' 
@@ -70,7 +160,7 @@ def main(argv):
          gethelpmsg()
    else:
       gethelpmsg()
-
+   return True 
 
 if __name__ == "__main__":
    main(sys.argv[1:])
