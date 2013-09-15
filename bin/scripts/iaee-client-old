@@ -1,8 +1,0 @@
-#!/bin/bash
-
-echo "Starting client..."
-echo "-- Output will be redirected to $HOME/.iaee/.client.tty -- (tail that file to know what is going on)"
-sleep 1
-java -jar $HOME/.iaee/iaee.jar -c &> $HOME/.iaee/.client.tty &
-echo $! > $HOME/.iaee/.client.tty
-exit 0

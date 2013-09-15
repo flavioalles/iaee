@@ -1,8 +1,75 @@
-#!/bin/bash
+#!/usr/bin/python
 
-echo "Starting client..."
-echo "-- Output will be redirected to $HOME/.iaee/.client.tty -- (tail that file to know what is going on)"
-sleep 1
-java -jar $HOME/.iaee/iaee.jar -c &> $HOME/.iaee/.client.tty &
-echo $! > $HOME/.iaee/.client.tty
-exit 0
+from os import devnull as DEVNULL
+import os.path
+import socket
+import subprocess
+import sys
+
+def updatepidfile(pid):
+   pidfile = open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid', 'w')
+   #pidfile = open(IAEE_HOME + '/.master.pid', 'w') #dbg
+   pidfile.write(pid + '\n')
+   pidfile.close()
+   return True
+
+def startclient(IAEE_HOME, quiet):
+   if quiet:
+      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-c'], stdout=open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '-stdout.tty', 'a'), stderr=open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '-stderr.tty', 'a')) 
+      # update IAEE_HOME/.master/master-$HOSTNAME.pid
+      updatepidfile(iaee.pid)
+   else:
+      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-c']) 
+      # update IAEE_HOME/.master/master-$HOSTNAME.pid
+      updatepidfile(iaee.pid)
+      iaee.wait()
+   return True
+
+def helpmsg(IAEE_HOME):
+   print("iaee-client: starts a client iaee instance.")
+   print
+   print("Usage:")
+   print("     <iaee-client> runs verbosely, printing everything to the current terminal.")
+   print("     <iaee-client verbose> runs verbosely, printing everything to the current terminal.")
+   print("     <iaee-client quiet> quiet run - output is redirected to " + IAEE_HOME + "/.client/client-" + str(socket.gethostname()) + "-stdout.tty and " + IAEE_HOME + "/.client/client-" + str(socket.gethostname()) + "-stderr.tty.")
+   print("     <iaee-client help> prints this help message.")
+   return True
+
+def gethelpmsg():
+   print("Wrong usage.")
+   print("Type <iaee-client> for usage instructions.")
+   return True
+
+def main(argv):
+   IAEE_HOME = os.path.expanduser('~') + '/.iaee' 
+   if len(argv) == 0:
+      print("Starting iaee client instance...")
+      status = subprocess.call(['iaee-status', 'quiet'])
+      if status == 2 or status == 3:
+         print("iaee-client already running on " + str(socket.gethostname()) + ".")
+      else:
+         startclient(IAEE_HOME, False)
+   elif len(argv) == 1:
+      if argv[0] == 'verbose':
+         print("Starting iaee client instance...")
+         status = subprocess.call(['iaee-status', 'quiet'])
+         if status == 2 or status == 3:
+            print("iaee-client already running on " + str(socket.gethostname()) + ".")
+         else:
+            startclient(IAEE_HOME, False)
+      elif argv[0] == 'quiet':
+         print("Starting iaee client instance...")
+         status = subprocess.call(['iaee-status', 'quiet'])
+         if status == 2 or status == 3:
+            print("iaee-client already running on " + str(socket.gethostname()) + ".")
+         else:
+            startclient(IAEE_HOME, True)
+      elif argv[0] == 'help':
+         helpmsg(IAEE_HOME)
+      else:
+         gethelpmsg()
+   else:
+      gethelpmsg()
+
+if __name__ == "__main__":
+   main(sys.argv[1:])

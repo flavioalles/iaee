@@ -1,8 +1,0 @@
-#!/bin/bash
-
-echo "Starting master..."
-echo "-- Output will be redirected to $HOME/.iaee/.master.tty -- (tail that file to know what is going on)"
-sleep 1
-java -jar $HOME/.iaee/iaee.jar -m &> $HOME/.iaee/.master.tty &
-echo $! > $HOME/.iaee/.master.pid
-exit 0

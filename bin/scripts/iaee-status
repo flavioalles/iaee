@@ -46,7 +46,6 @@ def helpMsg():
    print "     1 - Master running"
    print "     2 - Client Running"
    print "     3 - Master & Client running"
-   print
 
 def getHelpMsg():
    print "Wrong usage."

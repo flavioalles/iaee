@@ -84,7 +84,7 @@ def hiddenclientdir(IAEE_HOME):
    if not os.path.isdir(IAEE_HOME + '/.client'):
       os.mkdir(IAEE_HOME + '/.client')
    # /.client: creation of hidden files in the hidden directory (*.pid, *.tty) 
-   for fileext in ['.pid', '.tty', '-stderr.tty']:
+   for fileext in ['.pid', '-stdout.tty', '-stderr.tty']:
       createfile(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + fileext)
    return True
 
@@ -92,7 +92,7 @@ def hiddenmasterdir(IAEE_HOME):
    if not os.path.isdir(IAEE_HOME + '/.master'):
       os.mkdir(IAEE_HOME + '/.master')
    # /.master: creation of hidden files in the hidden directory (*.pid, *.tty) 
-   for fileext in ['.pid', '.tty', '-stderr.tty']:
+   for fileext in ['.pid', '-stdout.tty', '-stderr.tty']:
       createfile(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + fileext)
    return True
 

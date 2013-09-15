@@ -6,33 +6,33 @@ import socket
 import subprocess
 import sys
 
-def startmaster(IAEE_HOME, quiet):
-   if quiet:
-      # java -jar IAEE_HOME/jar/iaee.jar -m
-      #subprocess.call(['java', '-jar', IAEE_HOME + '/jar/iaee.jar', '-m', '&>', IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.tty', '&'])
-      #subprocess.call(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m', '&>', IAEE_HOME + '/.master.tty', '&']) #dbg
-      #subprocess.call(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m'], stdout=open(IAEE_HOME + '/.master.tty', 'a'), stderr=open(IAEE_HOME + '/.master-stderr.tty', 'a')) #dbg
-      subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m'], stdout=open(IAEE_HOME + '/.master.tty', 'a'), stderr=open(IAEE_HOME + '/.master-stderr.tty', 'a')) #dbg
-   else:
-      #subprocess.call(['java', '-jar', IAEE_HOME + '/jar/iaee.jar', '-m', '&'])
-      #subprocess.call(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m', '&']) #dbg
-      subprocess.call(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m']) #dbg
-   # update IAEE_HOME/.master/master-$HOSTNAME.pid
-   pid = subprocess.check_output(['echo', '$?'], stderr=open(DEVNULL, 'wb'))
-   #pidfile = open(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid', 'w')
-   pidfile = open(IAEE_HOME + '/.master.pid', 'w') #dbg
+def updatepidfile(pid):
+   pidfile = open(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid', 'w')
+   #pidfile = open(IAEE_HOME + '/.master.pid', 'w') #dbg
    pidfile.write(pid + '\n')
    pidfile.close()
+   return True
+
+def startmaster(IAEE_HOME, quiet):
+   if quiet:
+      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m'], stdout=open(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '-stdout.tty', 'a'), stderr=open(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '-stderr.tty', 'a')) 
+      # update IAEE_HOME/.master/master-$HOSTNAME.pid
+      updatepidfile(iaee.pid)
+   else:
+      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-m']) 
+      # update IAEE_HOME/.master/master-$HOSTNAME.pid
+      updatepidfile(iaee.pid)
+      iaee.wait()
    return True
 
 def helpmsg(IAEE_HOME):
    print("iaee-master: starts a master (server) iaee instance.")
    print
    print("Usage:")
-   print("     <iaee-master> runs verbosely, printing everything to current terminal.")
-   print("     <iaee-master quiet> quiet run - output is redirected to " + IAEE_HOME + "/.master/master-" + str(socket.gethostname()) + ".tty.")
+   print("     <iaee-master> runs verbosely, printing everything to the current terminal.")
+   print("     <iaee-master verbose> runs verbosely, printing everything to the current terminal.")
+   print("     <iaee-master quiet> quiet run - output is redirected to " + IAEE_HOME + "/.master/master-" + str(socket.gethostname()) + "-stdout.tty and " + IAEE_HOME + "/.master/master-" + str(socket.gethostname()) + "-stderr.tty.")
    print("     <iaee-master help> prints this help message.")
-   print
    return True
 
 def gethelpmsg():
@@ -43,10 +43,27 @@ def gethelpmsg():
 def main(argv):
    IAEE_HOME = os.path.expanduser('~') + '/.iaee' 
    if len(argv) == 0:
-      startmaster(IAEE_HOME, False)
+      print("Starting iaee master instance...")
+      status = subprocess.call(['iaee-status', 'quiet'])
+      if status == 1 or status == 3:
+         print("iaee-master already running on " + str(socket.gethostname()) + ".")
+      else:
+         startmaster(IAEE_HOME, False)
    elif len(argv) == 1:
-      if argv[0] == 'quiet':
-         startmaster(IAEE_HOME, True)
+      if argv[0] == 'verbose':
+         print("Starting iaee master instance...")
+         status = subprocess.call(['iaee-status', 'quiet'])
+         if status == 1 or status == 3:
+            print("iaee-master already running on " + str(socket.gethostname()) + ".")
+         else:
+            startmaster(IAEE_HOME, False)
+      elif argv[0] == 'quiet':
+         print("Starting iaee master instance...")
+         status = subprocess.call(['iaee-status', 'quiet'])
+         if status == 1 or status == 3:
+            print("iaee-master already running on " + str(socket.gethostname()) + ".")
+         else:
+            startmaster(IAEE_HOME, True)
       elif argv[0] == 'help':
          helpmsg(IAEE_HOME)
       else:
