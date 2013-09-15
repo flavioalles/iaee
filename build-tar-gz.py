@@ -9,7 +9,7 @@ def main(argv):
    if len(argv) == 0:
       print('Creating iaee.tar.gz...')
       sleep(1)
-      tar = tarfile.open(os.getcwd() + "/tmp/iaee.tar.gz", "w:gz")
+      tar = tarfile.open(os.getcwd() + "/iaee.tar.gz", "w:gz")
       tar.add(os.getcwd()+ '/bin/scripts', arcname='iaee/bin')
       tar.add(os.getcwd()+ '/conf/config.properties', arcname='iaee/conf/config.properties')
       tar.add(os.getcwd()+ '/jar', arcname='iaee/jar')

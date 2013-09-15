@@ -17,7 +17,7 @@ def createfile(filename):
    fl.close()
    return True
 
-def updatecontrolfile(IAEE_HOME)
+def updatecontrolfile(IAEE_HOME):
    # get value from .db.ctrl
    fl = open(IAEE_HOME + '/.ctrl.db', 'r')
    n = fl.readline()
@@ -32,7 +32,7 @@ def updatecontrolfile(IAEE_HOME)
    fl.close()
    return n
 
-def movedb(IAEE_HOME)
+def movedb(IAEE_HOME):
    # move iaee.db to old/iaee-n.db
    os.rename(IAEE_HOME + '/db/iaee.db', IAEE_HOME + '/db/old/iaee-' + str(updatecontrolfile(IAEE_HOME)) + '.db')
    return True
@@ -138,7 +138,6 @@ def helpmsg():
    print("     <python install.py full> installs all files necessary to execution (master & client).")
    print("     <python install.py client> installs only necessary files for client use (to be used in a NFS environment).")
    print("     <python install.py help> prints this help message.")
-   print
    return True
 
 def gethelpmsg():
