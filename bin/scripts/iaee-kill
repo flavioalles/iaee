@@ -22,7 +22,7 @@ def killclient(IAEE_HOME):
    status = subprocess.call(['iaee-status','quiet'])
    if status == 2 or status == 3:
       pid = get_pid(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid')
-      if != -99:
+      if pid != -99:
          try:
             os.kill(pid, signal.SIGKILL)
          except OSError:
@@ -36,7 +36,7 @@ def killmaster(IAEE_HOME):
    status = subprocess.call(['iaee-status','quiet'])
    if status == 1 or status == 3:
       pid = get_pid(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid')
-      if != -99:
+      if pid != -99:
          try:
             os.kill(pid, signal.SIGKILL)
          except OSError:
