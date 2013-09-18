@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from os import devnull as DEVNULL
+from os import devnull 
 import os.path
 import sys
 import subprocess
@@ -8,18 +8,14 @@ import socket
 
 # checks if iaee is running
 
-def checkStatus():
+def checkStatus(IAEE_HOME):
    status = 0
    # pgrep -F $HOME/.iaee/.[client||master].pid
    for instance in ['master', 'client']:
-      if instance == 'master':
-         pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '.pid'])
-      else:
-         pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '.pid']) #dbg
-         #pgrep = list(['pgrep', '-cF', os.path.expanduser('~') + '/.iaee/.' + instance + '-' + str(socket.gethostname()) + '.pid'])
+      pgrep = list(['pgrep', '-cF', IAEE_HOME + '/.' + instance + '/' + instance + '-' + str(socket.gethostname()) + '.pid'])
       try:
-         output = subprocess.check_output(pgrep, stderr=open(DEVNULL, 'wb'))
-      except subprocess.CalledProcessError as e:
+         output = subprocess.check_output(pgrep, stderr=open(devnull, 'wb'))
+      except subprocess.CalledProcessError, e:
          output = e.output
       try:
          output = int(output)
@@ -29,7 +25,6 @@ def checkStatus():
          status += output
       else:
          status += 2*output
-
    return status
 
 
@@ -52,9 +47,10 @@ def getHelpMsg():
    print "Type <iaee-status help> for usage instructions."
 
 def main(argv):
+   IAEE_HOME = os.path.expanduser('~') + '/.iaee'
    status = 0
    if len(argv) == 0:
-      status = checkStatus()
+      status = checkStatus(IAEE_HOME)
       if status == 0:
          print "iaee is not running."
       elif status == 1:
@@ -65,7 +61,7 @@ def main(argv):
          print "iaee-master & iaee-client are running."
    elif len(argv) == 1:
       if argv[0] == 'quiet':
-         status = checkStatus()
+         status = checkStatus(IAEE_HOME)
       elif argv[0] == 'help':
          helpMsg()
       else:

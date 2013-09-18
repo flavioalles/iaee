@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 def killclient(IAEE_HOME):
+   killed = 1
    status = subprocess.call(['iaee-status','quiet'])
    if status == 2 or status == 3:
       # pkill -F $HOME/.iaee/.client/client-$HOSTNAME.pid
@@ -13,7 +14,7 @@ def killclient(IAEE_HOME):
    return killed
 
 def killmaster(IAEE_HOME):
-   killed = False
+   killed = 1
    status = subprocess.call(['iaee-status','quiet'])
    if status == 1 or status == 3:
       # pkill -F $HOME/.iaee/.master/master-$HOSTNAME.pid

@@ -1,28 +1,31 @@
 #!/usr/bin/python
 
-from os import devnull as DEVNULL
+from time import sleep
 import os.path
 import socket
 import subprocess
 import sys
 
-def updatepidfile(pid):
+def updatepidfile(IAEE_HOME, pid):
    pidfile = open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid', 'w')
-   #pidfile = open(IAEE_HOME + '/.master.pid', 'w') #dbg
-   pidfile.write(pid + '\n')
+   pidfile.write(str(pid) + '\n')
    pidfile.close()
    return True
 
 def startclient(IAEE_HOME, quiet):
    if quiet:
-      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-c'], stdout=open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '-stdout.tty', 'a'), stderr=open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '-stderr.tty', 'a')) 
+      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/jar/iaee.jar', '-c'], stdout=open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '-stdout.tty', 'a'), stderr=open(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '-stderr.tty', 'a')) 
       # update IAEE_HOME/.master/master-$HOSTNAME.pid
-      updatepidfile(iaee.pid)
+      updatepidfile(IAEE_HOME, iaee.pid)
    else:
-      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/iaee.jar', '-c']) 
+      iaee = subprocess.Popen(['java', '-jar', IAEE_HOME + '/jar/iaee.jar', '-c']) 
       # update IAEE_HOME/.master/master-$HOSTNAME.pid
-      updatepidfile(iaee.pid)
-      iaee.wait()
+      updatepidfile(IAEE_HOME, iaee.pid)
+      try:
+         iaee.wait()
+      except KeyboardInterrupt:
+         print
+         print('iaee-client killed.')
    return True
 
 def helpmsg(IAEE_HOME):
@@ -44,24 +47,30 @@ def main(argv):
    IAEE_HOME = os.path.expanduser('~') + '/.iaee' 
    if len(argv) == 0:
       print("Starting iaee client instance...")
+      sleep(1)
       status = subprocess.call(['iaee-status', 'quiet'])
       if status == 2 or status == 3:
          print("iaee-client already running on " + str(socket.gethostname()) + ".")
+         sleep(1)
       else:
          startclient(IAEE_HOME, False)
    elif len(argv) == 1:
       if argv[0] == 'verbose':
          print("Starting iaee client instance...")
+         sleep(1)
          status = subprocess.call(['iaee-status', 'quiet'])
          if status == 2 or status == 3:
             print("iaee-client already running on " + str(socket.gethostname()) + ".")
+            sleep(1)
          else:
             startclient(IAEE_HOME, False)
       elif argv[0] == 'quiet':
          print("Starting iaee client instance...")
+         sleep(1)
          status = subprocess.call(['iaee-status', 'quiet'])
          if status == 2 or status == 3:
             print("iaee-client already running on " + str(socket.gethostname()) + ".")
+            sleep(1)
          else:
             startclient(IAEE_HOME, True)
       elif argv[0] == 'help':

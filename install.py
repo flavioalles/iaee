@@ -2,6 +2,7 @@
 
 import os
 import os.path
+import stat
 import shutil
 import socket
 import sys
@@ -18,16 +19,16 @@ def createfile(filename):
    return True
 
 def updatecontrolfile(IAEE_HOME):
-   # get value from .db.ctrl
-   fl = open(IAEE_HOME + '/.ctrl.db', 'r')
-   n = fl.readline()
+   # get value from .ctrl.db
+   fl = open(IAEE_HOME + '/db/.ctrl.db', 'r')
+   n = str(fl.readline())
    if not n:
       n = int(0)
    else:
       n = int(n)
    fl.close()
    # update control file value to n+1
-   fl = open(IAEE_HOME + '/.ctrl.db', 'w')
+   fl = open(IAEE_HOME + '/db/.ctrl.db', 'w')
    fl.write(str(n+1) + '\n')
    fl.close()
    return n
@@ -46,7 +47,19 @@ def conf(CWD, IAEE_HOME):
    if not os.path.isdir(IAEE_HOME + '/conf'):
       os.mkdir(IAEE_HOME + '/conf')
    # /conf: copy 'config.properties'
-   shutil.copy(CWD + '/conf/config.properties', IAEE_HOME + '/conf') 
+   conf = open(IAEE_HOME + '/conf/config.properties', 'w')
+   aux = open(CWD + '/conf/config.properties', 'r')
+   for line in aux:
+      if line.split('=')[0] == 'SERVER_ADDRESS':
+         addr = raw_input('iaee-master address [press ENTER for default(' + line.split('=')[1].rstrip() + ')]: ')
+         if addr:
+            conf.write('SERVER_ADDRESS=' + addr + '\n')
+         else:
+            conf.write(line.rstrip() + '\n')
+      else:
+         conf.write(line.rstrip() + '\n')
+   conf.close()
+   aux.close()
    return True
 
 def db(IAEE_HOME):
@@ -54,7 +67,7 @@ def db(IAEE_HOME):
    if not os.path.isdir(IAEE_HOME + '/db'):
       os.mkdir(IAEE_HOME + '/db')
       os.mkdir(IAEE_HOME + '/db/old')
-      createfile(IAEE_HOME + '/.ctrl.db') 
+      createfile(IAEE_HOME + '/db/.ctrl.db') 
    else:
       if os.path.isfile(IAEE_HOME + '/db/iaee.db'):
          # move old db 
@@ -77,7 +90,7 @@ def scripts(CWD, IAEE_HOME):
    # /scripts: copy scripts to iaee's directory
    for dirpath, dirname, filename in os.walk(CWD + '/bin'):
       for fl in filename:
-         shutil.copy(os.path.join(dirpath, fl), IAEE_HOME + '/scripts')
+         shutil.copy(os.path.join(dirpath, fl), IAEE_HOME + '/scripts')  
    return True
 
 def hiddenclientdir(IAEE_HOME):
@@ -104,6 +117,10 @@ def homebin(CWD):
    for dirpath, dirname, filename in os.walk(CWD + '/bin'):
       for fl in filename:
          shutil.copy(os.path.join(dirpath, fl), os.path.expanduser('~') + '/bin')
+   for dirpath, dirname, filename in os.walk(os.path.expanduser('~') + '/bin'):
+      for fl in filename:
+         if fl.startswith('iaee-') or fl.startswith('dbg-'):
+            os.chmod(os.path.join(dirpath, fl), stat.S_IRWXU | stat.S_IRGRP | stat.S_IROTH) 
    return True
 
 def fullinstall(CWD, IAEE_HOME):

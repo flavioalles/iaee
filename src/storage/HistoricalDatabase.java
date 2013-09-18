@@ -70,9 +70,7 @@ public class HistoricalDatabase
 			String USER_NAME = new String(getUserName());
 			while (USER_NAME == ex)
 				USER_NAME = getUserName();
-			//System.out.println("jdbc:sqlite:/home/" + USER_NAME + "/iaee/" + file);//debug
-			//System.exit(0);//debug
-			conn = DriverManager.getConnection("jdbc:sqlite:/home/" + USER_NAME + "/.iaee/" + file);
+			conn = DriverManager.getConnection("jdbc:sqlite:/home/" + USER_NAME + "/.iaee/db/" + file);
 			initDB();
 		} catch (final SQLException e)
 		{

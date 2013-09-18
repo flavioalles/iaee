@@ -1,0 +1,17 @@
+# ignore hidden files
+.*
+# do not ignore .gitignore
+!.gitignore
+# do not ignore eclipse specific hidden files
+!.classpath
+!.project
+# ignore tmp files
+*~
+# ignore tmp/
+tmp/
+# ignore iaee.tar.bz
+iaee.tar.gz
+# ignore transfer scripts
+transfer-to-*
+# ignore java binaries
+*.class
