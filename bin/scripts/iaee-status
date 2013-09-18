@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from os import devnull 
+from os import kill
 import os.path
 import sys
 import subprocess
@@ -8,25 +9,31 @@ import socket
 
 # checks if iaee is running
 
+def get_pid(pidpath):
+   pidfile = open(pidpath, 'r')
+   pid = pidfile.readline()
+   pidfile.close()
+   try: 
+      pid = int(pid)
+   except ValueError:
+      pid = int(-99)
+   return pid
+
 def checkStatus(IAEE_HOME):
    status = 0
-   # pgrep -F $HOME/.iaee/.[client||master].pid
    for instance in ['master', 'client']:
-      pgrep = list(['pgrep', '-cF', IAEE_HOME + '/.' + instance + '/' + instance + '-' + str(socket.gethostname()) + '.pid'])
-      try:
-         output = subprocess.check_output(pgrep, stderr=open(devnull, 'wb'))
-      except subprocess.CalledProcessError, e:
-         output = e.output
-      try:
-         output = int(output)
-      except ValueError:
-         output = int(0)
-      if instance == 'master':
-         status += output
-      else:
-         status += 2*output
+      pid = get_pid(IAEE_HOME + '/.' + instance + '/' + instance + '-' + str(socket.gethostname()) + '.pid')
+      if pid != -99:
+         try:
+            os.kill(pid, 0)
+         except OSError:
+            pass
+         else:
+            if instance == 'master':
+               status += 1
+            else:
+               status += 2
    return status
-
 
 def helpMsg():
    print "iaee-status: checks if there are any running instances of iaee (master & client)."

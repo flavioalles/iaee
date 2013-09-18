@@ -1,24 +1,48 @@
 #!/usr/bin/python
 
+import os
 import os.path
+import signal
 import socket
 import subprocess
 import sys
 
+def get_pid(pidpath):
+   pidfile = open(pidpath, 'r')
+   pid = pidfile.readline()
+   pidfile.close()
+   try:
+      pid = int(pid)
+   except ValueError:
+      pid = int(-99)
+   return pid
+
 def killclient(IAEE_HOME):
-   killed = 1
+   killed = False
    status = subprocess.call(['iaee-status','quiet'])
    if status == 2 or status == 3:
-      # pkill -F $HOME/.iaee/.client/client-$HOSTNAME.pid
-      killed = subprocess.call(['pkill', '-F', IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid'])
+      pid = get_pid(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid')
+      if != -99:
+         try:
+            os.kill(pid, signal.SIGKILL)
+         except OSError:
+            pass
+         else:
+            killed = True
    return killed
 
 def killmaster(IAEE_HOME):
-   killed = 1
+   killed = False
    status = subprocess.call(['iaee-status','quiet'])
    if status == 1 or status == 3:
-      # pkill -F $HOME/.iaee/.master/master-$HOSTNAME.pid
-      killed = subprocess.call(['pkill', '-F', IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid'])
+      pid = get_pid(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid')
+      if != -99:
+         try:
+            os.kill(pid, signal.SIGKILL)
+         except OSError:
+            pass
+         else:
+            killed = True
    return killed
 
 def helpmsg():
@@ -41,72 +65,42 @@ def main(argv):
    if len(argv) == 0:
       # iaee-kill all
       killed = killclient(IAEE_HOME)
-      if killed == 0:
-         # one or more processes matched the criteria
+      if killed == True:
          print("iaee-client running on " + str(socket.gethostname()) + " killed.")
-      elif killed == 1:
-         # no processes matched 
+      else:
          print("no iaee-client to kill on " + str(socket.gethostname()) + ".")
-      else:  
-         # syntax or fatal error (pkill)
-         print("pkill error.")
       killed = killmaster(IAEE_HOME)
-      if killed == 0:
-         # one or more processes matched the criteria
+      if killed == True:
          print("iaee-master running on " + str(socket.gethostname()) + " killed.")
-      elif killed == 1:
-         # no processes matched 
+      else:
          print("no iaee-master to kill on " + str(socket.gethostname()) + ".")
-      else:  
-         # syntax or fatal error (pkill)
-         print("pkill error.")
    elif len(argv) == 1:
       if argv[0] == 'client':
          # kill client
          killed = killclient(IAEE_HOME)
-         if killed == 0:
-            # one or more processes matched the criteria
+         if killed == True:
             print("iaee-client running on " + str(socket.gethostname()) + " killed.")
-         elif killed == 1:
-            # no processes matched 
+         else:
             print("no iaee-client to kill on " + str(socket.gethostname()) + ".")
-         else:  
-            # syntax or fatal error (pkill)
-            print("pkill error.")
       elif argv[0] == 'master':
          # kill master
          killed = killmaster(IAEE_HOME)
-         if killed == 0:
-            # one or more processes matched the criteria
+         if killed == True:
             print("iaee-master running on " + str(socket.gethostname()) + " killed.")
-         elif killed == 1:
-            # no processes matched 
+         else:
             print("no iaee-master to kill on " + str(socket.gethostname()) + ".")
-         else:  
-            # syntax or fatal error (pkill)
-            print("pkill error.")
       elif argv[0] == 'all': 
          # iaee-kill all
          killed = killclient(IAEE_HOME)
-         if killed == 0:
-            # one or more processes matched the criteria
+         if killed == True:
             print("iaee-client running on " + str(socket.gethostname()) + " killed.")
-         elif killed == 1:
-            # no processes matched 
+         else:
             print("no iaee-client to kill on " + str(socket.gethostname()) + ".")
-         else:  
-            # syntax or fatal error (pkill)
-            print("pkill error.")
          killed = killmaster(IAEE_HOME)
-         if killed == 0:
-            # one or more processes matched the criteria
+         if killed == True:
             print("iaee-master running on " + str(socket.gethostname()) + " killed.")
-         elif killed == 1:
-            # no processes matched 
+         else:
             print("no iaee-master to kill on " + str(socket.gethostname()) + ".")
-         else:  
-            # syntax or fatal error (pkill)
-            print("pkill error.")
       elif argv[0] == 'help':
          helpmsg()
       else:
