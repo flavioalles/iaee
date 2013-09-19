@@ -1,22 +1,27 @@
 #!/usr/bin/python
 
+### /home/falles/bin/python2.7
+
 from os import devnull 
 from os import kill
 import os.path
 import sys
-import subprocess
 import socket
 
 # checks if iaee is running
 
 def get_pid(pidpath):
-   pidfile = open(pidpath, 'r')
-   pid = pidfile.readline()
-   pidfile.close()
-   try: 
-      pid = int(pid)
-   except ValueError:
+   try:
+      pidfile = open(pidpath, 'r')
+   except IOError:
       pid = int(-99)
+   else:
+      pid = pidfile.readline()
+      pidfile.close()
+      try: 
+         pid = int(pid)
+      except ValueError:
+         pid = int(-99)
    return pid
 
 def checkStatus(IAEE_HOME):

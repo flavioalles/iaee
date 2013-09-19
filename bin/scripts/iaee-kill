@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+### /home/falles/bin/python2.7
+
 import os
 import os.path
 import signal
@@ -8,18 +10,22 @@ import subprocess
 import sys
 
 def get_pid(pidpath):
-   pidfile = open(pidpath, 'r')
-   pid = pidfile.readline()
-   pidfile.close()
    try:
-      pid = int(pid)
-   except ValueError:
+      pidfile = open(pidpath, 'r')
+   except IOError:
       pid = int(-99)
+   else:
+      pid = pidfile.readline()
+      pidfile.close()
+      try:
+         pid = int(pid)
+      except ValueError:
+         pid = int(-99)
    return pid
 
 def killclient(IAEE_HOME):
    killed = False
-   status = subprocess.call(['iaee-status','quiet'])
+   status = subprocess.call([os.path.expanduser('~') + '/bin/iaee-status','quiet'])
    if status == 2 or status == 3:
       pid = get_pid(IAEE_HOME + '/.client/client-' + str(socket.gethostname()) + '.pid')
       if pid != -99:
@@ -33,7 +39,7 @@ def killclient(IAEE_HOME):
 
 def killmaster(IAEE_HOME):
    killed = False
-   status = subprocess.call(['iaee-status','quiet'])
+   status = subprocess.call([os.path.expanduser('~') + '/bin/iaee-status','quiet'])
    if status == 1 or status == 3:
       pid = get_pid(IAEE_HOME + '/.master/master-' + str(socket.gethostname()) + '.pid')
       if pid != -99:
