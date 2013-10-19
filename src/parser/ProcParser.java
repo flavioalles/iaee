@@ -248,7 +248,7 @@ public class ProcParser {
         final ArrayList<String> tempPart = getPartitionNames(partitionData);
         final ArrayList<String> tempPartClean = new ArrayList<String>();
         for (final String part : tempPart)
-            if (part.contains("sda"))
+            if (part.contains("sda") || part.contains("hda")) 
                 tempPartClean.add(part);
         // Parse /proc/diskstats to obtain disk statistics
         for (final String line : tempFile)
